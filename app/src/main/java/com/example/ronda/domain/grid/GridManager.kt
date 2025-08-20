@@ -9,7 +9,7 @@ package com.example.ronda.domain.grid
  * @property totalRows The total number of rows in the grid.
  * @property totalColumns The total number of columns in the grid.
  */
-open class GridManager(
+abstract class GridManager(
     val totalRows: Int,
     val totalColumns: Int
 ) {
@@ -92,8 +92,6 @@ open class GridManager(
         val zeroBasedLinearIndex = cellId - 1
 
         // Calculate 0-based row and column
-        // r = index / C
-        // c = index % C
         val zeroBasedRow = zeroBasedLinearIndex / totalColumns
         val zeroBasedCol = zeroBasedLinearIndex % totalColumns
 
@@ -137,7 +135,7 @@ open class GridManager(
      * @param cellId The 1-based linear cell number.
      * @return A Pair representing (x, y) screen coordinates of the cell's center, or null.
      */
-    fun getCellCenterCoordsFromCellNum(cellId: Int): Pair<Float, Float>? {
+    fun getCellCenterCoordsFromCellId(cellId: Int): Pair<Float, Float>? {
         val topLeft = getCoordsFromCellId(cellId) ?: return null
         return Pair(topLeft.first + cellWidth / 2, topLeft.second + cellHeight / 2)
     }
@@ -155,49 +153,4 @@ open class GridManager(
     override fun toString(): String {
         return "GridWithCellId(rows=$totalRows, cols=$totalColumns, canvasW=$canvasWidth, canvasH=$canvasHeight, cellW=$cellWidth, cellH=$cellHeight)"
     }
-}
-fun main() {
-    // Create a 3x4 grid
-    val myGrid = GridManager(totalRows = 4, totalColumns = 4)
-    println("Initial Grid: $myGrid")
-
-    // Update canvas size
-    myGrid.updateCanvasSize(newWidth = 100f, newHeight = 100f)
-    println("Grid after canvas update: $myGrid")
-    println("Cell Width: ${myGrid.cellWidth}, Cell Height: ${myGrid.cellHeight}")
-
-    // Get cell from screen coordinates
-    val touchX = 26f // 2 col
-    val touchY = 24f // 1 row
-    val cell = myGrid.getCellIdFromCoords(touchX, touchY)
-    val cellRC = myGrid.getRowColFromCellId(cell)
-    if (cell != null) {
-        println("Coordinates ($touchX, $touchY) are in cell: $cell (row=${cellRC!!.first}, col=${cellRC.second})")
-    } else {
-        println("Coordinates ($touchX, $touchY) are outside the grid or grid not ready.")
-    }
-
-
-    val coords = myGrid.getCoordsFromCellId(5)
-    if (coords != null) {
-        println("Top-left of cell 5 is at: (${coords.first}, ${coords.second})")
-        val centerCoords = myGrid.getCellCenterCoordsFromCellNum(5)
-        println("Center of cell 5 is at: (${centerCoords?.first}, ${centerCoords?.second})")
-    } else {
-        println("Cell 5 is invalid or grid not ready.")
-    }
-
-    // Check invalid cell
-    println("Is cell 3 valid? ${myGrid.isValidCellId(3)}") // true for a 4x4 grid (max row index 2, max col index 3)
-    println("Is cell 0 valid? ${myGrid.isValidCellId(0)}")   // false
-
-    // Example with canvas size that doesn't divide perfectly
-    myGrid.updateCanvasSize(newWidth = 100f, newHeight = 70f) // 4 cols -> 25f width, 3 rows -> 23.33f height
-    println("Grid with non-integer division: $myGrid")
-    val cellAtBoundary = myGrid.getCellIdFromCoords(24.9f, 23.1f)
-    println("Cell $cellAtBoundary") // Should be (0,0) due to toInt() and coerceIn
-    val cellAtBoundary2 = myGrid.getCellIdFromCoords(25.1f, 23.5f)
-    val cellRC2 = myGrid.getRowColFromCellId(cellAtBoundary2)
-    println("Cell : ${cellAtBoundary2} row: ${cellRC2!!.first} and col: ${cellRC2.second}") // Should be (0,1) and (1,1) respectively if not for coerceIn
-    println("total cells is: ${myGrid.getTotalCellCount()}")
 }

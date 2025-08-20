@@ -17,22 +17,22 @@ class CardTest {
     @Test
     fun `positionCardOrder for DHAB type with num less than or equal to 7`() {
         // Test a few values within the num <= 7 range
-        val card1 = Card(CardType.DHAB, 1)
+        val card1 = Card.Front(CardType.Dhab, 1)
         assertEquals(1, card1.cardId) // num = 1 -> order 1
 
-        val card7 = Card(CardType.DHAB, 7)
+        val card7 = Card.Front(CardType.Dhab, 7)
         assertEquals(7, card7.cardId) // num = 7 -> order 7
     }
 
     @Test
     fun `positionCardOrder for DHAB type with num greater than 7`() {
-        val card10 = Card(CardType.DHAB, 10)
+        val card10 = Card.Front(CardType.Dhab, 10)
         assertEquals(8, card10.cardId) // num = 10 -> order 10-2=8
 
-        val card12 = Card(CardType.ZRAWET, 12)
+        val card12 = Card.Front(CardType.Zrawet, 12)
         assertEquals(40, card12.cardId) // num = 12 -> order 12+31-3=43-3=40
 
-        val card11 = Card(CardType.SYUFA, 11)
+        val card11 = Card.Front(CardType.Syufa, 11)
         assertEquals(29, card11.cardId) // num = 11 -> order 11+21-3=32-3 -> 29
     }
 
@@ -40,7 +40,7 @@ class CardTest {
     @Test
     fun `positionCardOrder for TWAJEN type`() {
         // range.first (11) + num - 3
-        val card11 = Card(CardType.TWAJEN, 11) // 11 + 11 - 3 = 19
+        val card11 = Card.Front(CardType.Twajen, 11) // 11 + 11 - 3 = 19
         assertEquals(19, card11.cardId)
 
     }
@@ -50,7 +50,7 @@ class CardTest {
     @Test
     fun `Card construction throws for invalid num 0`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            Card(CardType.DHAB, 0)
+            Card.Front(CardType.Dhab, 0)
         }
         assertEquals("Invalid card number", exception.message) // Or your more specific message
     }
@@ -60,7 +60,7 @@ class CardTest {
         // This test depends on your exact init block validation for num 8,9
         // If the rule is num in 8..9 throws, then:
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            Card(CardType.SYUFA, 8) // Assuming type does not matter for this rule
+            Card.Front(CardType.Syufa, 8) // Assuming type does not matter for this rule
         }
         assertEquals("Invalid card number", exception.message)
     }
@@ -71,8 +71,10 @@ class CardTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             // If this rule means ZRAWET 31 should fail, then Card init validation needs to be updated
             // Based on your current init: if (num == 0 || num in 8..9 || num > 12)
-            Card(CardType.TWAJEN, 13)
+            Card.Front(CardType.Twajen, 13)
         }
         assertEquals("Invalid card number", exception.message)
     }
+
+
 }

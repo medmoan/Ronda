@@ -5,7 +5,7 @@ import com.example.ronda.domain.card.CardType
 
 private typealias CellId = Int
 class CardGridManager(
-    val cards: List<Card>
+    val cards: List<Card.Front>
 ): GridManager(5, 5) {
     val grid = mutableMapOf<CellId, Card>()
     // The specific cell IDs to to populate
@@ -20,6 +20,24 @@ class CardGridManager(
         populateGridWithCards()
     }
 
+    /**
+     * To populate Back card of each player if they have any score
+     * @param player1FirstScore if player 1 possess any score, then Back card will be in specified cell provided in the list
+     * @param player2FirstScore the same for player2.
+     */
+    fun updatePlayerBackCells(player1FirstScore: Boolean = false, player2FirstScore: Boolean = false) {
+        if (playingCellIds.size != 2) return
+        if (player1FirstScore) {
+            val player1BackCellId = backCellIdOfPlayers.last()
+            if (isValidCellId(player1BackCellId))
+                grid[player1BackCellId] = Card.Back
+        }
+        if (player2FirstScore) {
+            val player2BackCellId = backCellIdOfPlayers.first()
+            if (isValidCellId(player2BackCellId))
+                grid[player2BackCellId] = Card.Back
+        }
+    }
 
     fun getCardFromCellId(cellId: Int): Card? {
         if (cellId > getTotalCellCount()) throw IndexOutOfBoundsException("Cell $cellId doesn't exist")
@@ -54,24 +72,20 @@ class CardGridManager(
                 println("Warning: Cell ID $cellIdToPopulate is not valid for this grid and was skipped.")
             }
         }
+        if (isValidCellId(backCellId)) grid[backCellId] = Card.Back
     }
 
 
 }
 
 fun main() {
-    val cards = mutableListOf<Card>()
+    val cards = mutableListOf<Card.Front>()
     for (i in 0..5) {
-        val type = CardType.DHAB
+        val type = CardType.Dhab
         val num = i + 1
-        cards.add(Card(type, num))
+        cards.add(Card.Front(type, num))
     }
-//    val card1 = Card(CardType.DHAB, 1)
-//    val card2 = Card(CardType.DHAB, 2)
-//    val card3 = Card(CardType.DHAB, 3)
-//    val card4 = Card(CardType.DHAB, 4)
-//    val card5 = Card(CardType.DHAB, 5)
-//    val card6 = Card(CardType.DHAB, 6)
+
 
 
     val cardGridManager = CardGridManager( cards).apply {
