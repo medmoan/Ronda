@@ -1,8 +1,16 @@
 package com.example.ronda.domain.card
 
-
+enum class User {
+        MYUSER,
+        OTHERUSER,
+        NONE
+}
 sealed class Card() {
-     data class Front(val type: CardType, val num: Int): Card() {
+     data class Front(
+             val type: CardType,
+             val num: Int,
+             var owner: User = User.NONE
+     ): Card() {
 
              val cardId get() = calculateCardId()
 
@@ -28,6 +36,10 @@ sealed class Card() {
              override fun toString(): String {
                      return "Card type='$type', number='$num')"
              }
+
+             /**
+              * @return Order number of card in asset/ folder which can be an Id(unique)
+              */
              private fun calculateCardId(): Int {
                      val currentRange = cardTypeRanges[type]
                              ?: throw NoSuchElementException("No range defined for card type: $type")
