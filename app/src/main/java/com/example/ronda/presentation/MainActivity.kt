@@ -7,11 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.ronda.presentation.ui.RondaPlay
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ronda.domain.rondaGame.Difficulty
+import com.example.ronda.presentation.ui.PlayRonda
+import com.example.ronda.presentation.ui.Ronda
 import com.example.ronda.presentation.ui.theme.RondaTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,18 +23,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             RondaTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RondaPlay(modifier = Modifier.padding(innerPadding))
+                    PlayRonda(modifier = Modifier
+                            .padding(innerPadding),
+                        diff = Difficulty.Easy)
                 }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RondaTheme {
-        RondaPlay()
     }
 }

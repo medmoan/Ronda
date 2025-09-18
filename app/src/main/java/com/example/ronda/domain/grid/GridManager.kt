@@ -60,7 +60,7 @@ abstract class GridManager(
      * @param y The y-coordinate on the canvas.
      * @return An Int representing the 1-based cell number if the coordinates are valid, otherwise null.
      */
-    fun getCellIdFromCoords(x: Float, y: Float): Int? {
+    fun getCellFromCoords(x: Float, y: Float): Int? {
         if (cellWidth == 0f || cellHeight == 0f) return null
         if (x < 0f || x >= canvasWidth || y < 0f || y >= canvasHeight) return null
 
@@ -105,12 +105,27 @@ abstract class GridManager(
      * @param cellId The 1-based linear cell number.
      * @return A Pair representing (x, y) screen coordinates, or null if cell number is invalid or grid not initialized.
      */
-    fun getCoordsFromCellId(cellId: Int): Pair<Float, Float>? {
-        val rowCol = getRowColFromCellId(cellId) ?: return null // Get 0-based row/col
 
-        // Reuse existing logic (or reimplement if you remove the row/col based one)
-        // For this, we need a way to get coordinates from 0-based row/col
+    fun getCoordsFromCellOrThrow(cellId: Int): Pair<Float, Float> {
+        val rowCol = getRowColFromCellId(cellId)
+            ?: throw IllegalArgumentException("Invalid cellId: $cellId cannot be mapped to row/column.")
+
+        // Assuming getCoordsFromZeroBasedCell can return null
         return getCoordsFromZeroBasedCell(rowCol.first + 1, rowCol.second + 1)
+            ?: throw IllegalStateException("Could not calculate coordinates for valid cellId $cellId (row=${rowCol.first + 1}, col=${rowCol.second + 1}). Check canvas dimensions or internal logic.")
+
+        // OR if getCoordsFromZeroBasedCellNonNull exists:
+        // return getCoordsFromZeroBasedCellNonNull(rowCol.first + 1, rowCol.second + 1)
+    }
+
+    fun getCoordsFromCellId(cell: Int): Pair<Float, Float>? {
+        val rowCol = getRowColFromCellId(cell)
+            ?: throw IllegalArgumentException("Invalid cellId: $cell cannot be mapped to row/column.")
+
+        // Assuming getCoordsFromZeroBasedCell can return null
+        return getCoordsFromZeroBasedCell(rowCol.first - 1,rowCol.second - 1)
+            ?: throw IllegalStateException("Could not calculate coordinates for valid cellId $cell (row=${rowCol.first + 1}, col=${rowCol.second + 1}). Check canvas dimensions or internal logic.")
+
     }
 
     /**
@@ -126,18 +141,6 @@ abstract class GridManager(
         val x = zeroBasedCol * cellWidth
         val y = zeroBasedRow * cellHeight
         return Pair(x, y)
-    }
-
-
-    /**
-     * Calculates the center (x, y) screen coordinates for a given 1-based linear cell number.
-     *
-     * @param cellId The 1-based linear cell number.
-     * @return A Pair representing (x, y) screen coordinates of the cell's center, or null.
-     */
-    fun getCellCenterCoordsFromCellId(cellId: Int): Pair<Float, Float>? {
-        val topLeft = getCoordsFromCellId(cellId) ?: return null
-        return Pair(topLeft.first + cellWidth / 2, topLeft.second + cellHeight / 2)
     }
 
     /**

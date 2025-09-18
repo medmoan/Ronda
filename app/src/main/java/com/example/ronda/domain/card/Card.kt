@@ -1,18 +1,20 @@
 package com.example.ronda.domain.card
 
+import com.example.ronda.domain.rondaGame.Flag
+
 enum class User {
         MYUSER,
         OTHERUSER,
         NONE
 }
-sealed class Card() {
+sealed class Card {
      data class Front(
              val type: CardType,
              val num: Int,
-             var owner: User = User.NONE
+             var owner: User? = null
      ): Card() {
 
-             val cardId get() = calculateCardId()
+             val cardId get() = calculateAssetId()
 
              init {
                     validateCard(num)
@@ -36,35 +38,57 @@ sealed class Card() {
              override fun toString(): String {
                      return "Card type='$type', number='$num')"
              }
+             override fun equals(other: Any?): Boolean {
+                     if (this === other) return true
+                     if (javaClass != other?.javaClass) return false
+                     other as Card.Front
+                     return cardId == other.cardId // Or type == other.type && num == other.num
+             }
+
+             override fun hashCode(): Int {
+                     return cardId.hashCode() // Or combine hashes of type and num
+             }
 
              /**
               * @return Order number of card in asset/ folder which can be an Id(unique)
               */
-             private fun calculateCardId(): Int {
-                     val currentRange = cardTypeRanges[type]
-                             ?: throw NoSuchElementException("No range defined for card type: $type")
-
-                     return if (currentRange.first == 1) {
-                             if (num <= 7) num
-                             else num - 2
+             private fun calculateAssetId(): Int {
+                     val baseOffset = when (type) { // Use lowercase for robust matching
+                             CardType.Dhab -> 0    // Golds: 1-10
+                             CardType.Twajen -> 10   // Cups: 11-20
+                             CardType.Syufa -> 20  // Swords: 21-30
+                             CardType.Zrawet -> 30  // Clubs: 31-40
                      }
-                     else currentRange.first + num - 3
+
+                     // The 'num' for face cards (10, 11, 12) maps to 8th, 9th, 10th card of the suit
+                     val valueInSuit = when (num) {
+                             in 1..7 -> num    // Cards 1 through 7 are direct
+                             10 -> 8           // Sota (10) is the 8th card in the suit sequence
+                             11 -> 9           // Caballo (11) is the 9th card
+                             12 -> 10          // Rey (12) is the 10th card
+                             else -> throw IllegalArgumentException("Invalid card number for type $type: $num")
+                     }
+
+                     return baseOffset + valueInSuit
              }
 
      }
-     data object Back: Card()
+        data class Flag(val flags: com.example.ronda.domain.rondaGame.Flag = com.example.ronda.domain.rondaGame.Flag.None): Card()
+        data object Back: Card()
 }
 
 fun getCell(card: Card) {
         when (card) {
             Card.Back -> println("Back card $card")
             is Card.Front -> println("Front card ${card.cardId} ${card.type} ${card.num}")
+            is Card.Flag -> { println("Flag card ${card.flags}") }
         }
 }
 fun main() {
         val front = Card.Front(CardType.Twajen, 12)
         val back = Card.Back
+        val flag = Card.Flag(Flag.Ronda)
         getCell(
-                front
+                flag
         )
 }

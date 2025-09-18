@@ -2,7 +2,6 @@ package com.example.ronda
 
 import com.example.ronda.domain.card.Card
 import com.example.ronda.domain.card.CardType
-import com.example.ronda.domain.card.getCell
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -45,30 +44,30 @@ class CardGridManagerTest {
         // For now, let's assume it has some way to verify, or we test via coordinate conversion.
 
         // A better test for this might be via getCellForCoordinates
-        val cell1 = cardGridManager.getCellIdFromCoords(50f, 50f)
+        val cell1 = cardGridManager.getCellFromCoords(50f, 50f)
         assertEquals(1, cell1)
 
         cardGridManager.updateCanvasSize(300f, 600f)
-        val cell_1 = cardGridManager.getCellIdFromCoords(50f, 50f) // Should still be (0,0)
+        val cell_1 = cardGridManager.getCellFromCoords(50f, 50f) // Should still be (0,0)
         assertEquals(1, cell_1)
     }
     @Test
     fun `getCellIdFromCoords returns correct cell 25 for given coordinates`() {
         cardGridManager.updateCanvasSize(100f, 100f)
-        val cell25 = cardGridManager.getCellIdFromCoords(95f, 95f)
+        val cell25 = cardGridManager.getCellFromCoords(95f, 95f)
         assertEquals(25, cell25)
     }
     @Test
     fun `getCellIdFromCoords returns correct cell 11 for given coordinates`() {
         cardGridManager.updateCanvasSize(100f, 100f)
-        val cell13 = cardGridManager.getCellIdFromCoords(50f, 50f)
+        val cell13 = cardGridManager.getCellFromCoords(50f, 50f)
         assertEquals(13, cell13)
     }
     @Test
     fun `CellId for Back card should return 6`() {
         cardGridManager.updateCanvasSize(100f, 100f)
         val card = Card.Back
-        assertEquals(6, cardGridManager.getCellIdFromCard(card))
+        assertEquals(6, cardGridManager.getCellFromCard(card))
     }
 
 
